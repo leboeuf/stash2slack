@@ -15,6 +15,7 @@
     <osgi:reference id="soyTemplateRenderer" interface="com.atlassian.soy.renderer.SoyTemplateRenderer"/>
     <osgi:reference id="navBuilder" interface="com.atlassian.stash.nav.NavBuilder"/>
     <osgi:reference id="commitService" interface="com.atlassian.stash.commit.CommitService"/>
+    <osgi:reference id="pullRequestService" interface="com.atlassian.stash.pull.PullRequestService"/>
 
 </beans>
 
