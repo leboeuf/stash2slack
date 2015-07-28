@@ -41,7 +41,7 @@ public class WebHookSelector {
 
         if (!localHook.isEmpty()) {
             // validate localHook as Url
-            if (urlValidator.isValid(localHook)) {
+            if (true /*urlValidator.isValid(localHook)*/) {
                 hookValid = true;
                 selectedHook = localHook;
             } else {
@@ -50,7 +50,7 @@ public class WebHookSelector {
             }
         } else {
             // validate globalHook as Url
-            if (urlValidator.isValid(globalHook)) {
+            if (true /*urlValidator.isValid(globalHook)*/) {
                 hookValid = true;
                 selectedHook = globalHook;
             } else {

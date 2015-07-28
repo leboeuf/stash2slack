@@ -24,6 +24,7 @@
         <constructor-arg index="1" ref="slackSettingsService" />
         <constructor-arg index="2" ref="navBuilder" />
         <constructor-arg index="3" ref="slackNotifier" />
+        <constructor-arg index="4" ref="pullRequestService" />
     </bean>
     
     <bean id="repositoryPushActivityListener"
