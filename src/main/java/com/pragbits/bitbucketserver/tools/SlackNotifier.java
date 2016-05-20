@@ -1,7 +1,6 @@
-package com.pragbits.stash.tools;
+package com.pragbits.bitbucketserver.tools;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -12,11 +11,9 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-
 public class SlackNotifier {
 
-    private final CloseableHttpClient httpClient = HttpClients.createDefault();
+    private final CloseableHttpClient httpClient = HttpClients.createSystem();
     private static final Logger log = LoggerFactory.getLogger(SlackNotifier.class);
 
     public  SlackNotifier() {
@@ -42,6 +39,7 @@ public class SlackNotifier {
                     HttpEntity entity = response.getEntity();
                     String responseString = EntityUtils.toString(entity, "UTF-8");
                     log.error("#error during httpPost in SlackNotifier: " + responseString);
+                    log.error("\tpayload string: " + jsonString);
                 }
             } finally {
                 response.close();

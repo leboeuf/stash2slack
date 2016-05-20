@@ -1,20 +1,18 @@
-package com.pragbits.stash;
+package com.pragbits.bitbucketserver;
 
 import com.atlassian.soy.renderer.SoyException;
 import com.atlassian.soy.renderer.SoyTemplateRenderer;
-import com.atlassian.stash.exception.AuthorisationException;
-import com.atlassian.stash.nav.NavBuilder;
-import com.pragbits.stash.SlackSettings;
-import com.pragbits.stash.SlackSettingsService;
-import com.pragbits.stash.PluginMetadata;
-import com.atlassian.stash.repository.Repository;
-import com.atlassian.stash.repository.RepositoryService;
-import com.atlassian.stash.user.Permission;
-import com.atlassian.stash.user.PermissionValidationService;
+import com.atlassian.bitbucket.AuthorisationException;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.repository.RepositoryService;
+import com.atlassian.bitbucket.permission.Permission;
+import com.atlassian.bitbucket.permission.PermissionValidationService;
 import com.atlassian.webresource.api.assembler.PageBuilderService;
-import com.atlassian.stash.i18n.I18nService;
+import com.atlassian.bitbucket.i18n.I18nService;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
+import com.pragbits.bitbucketserver.soy.SelectFieldOptions;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +45,7 @@ public class SlackSettingsServlet extends HttpServlet {
     }
 
     @Override
-    protected  void doPost(HttpServletRequest req, HttpServletResponse res)
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
         throws ServletException, IOException {
 
         try {
@@ -58,19 +56,40 @@ public class SlackSettingsServlet extends HttpServlet {
             return;
         }
 
-        boolean enabled = false;
-        if (null != req.getParameter("slackNotificationsEnabled") && req.getParameter("slackNotificationsEnabled").equals("on")) {
-          enabled = true;
+        NotificationLevel notificationLevel = NotificationLevel.VERBOSE;
+        if (null != req.getParameter("slackNotificationLevel")) {
+            notificationLevel = NotificationLevel.valueOf(req.getParameter("slackNotificationLevel"));
         }
 
-        boolean enabledPush = false;
-        if (null != req.getParameter("slackNotificationsEnabledForPush") && req.getParameter("slackNotificationsEnabledForPush").equals("on")) {
-            enabledPush = true;
+        NotificationLevel notificationPrLevel = NotificationLevel.VERBOSE;
+        if (null != req.getParameter("slackNotificationPrLevel")) {
+            notificationPrLevel = NotificationLevel.valueOf(req.getParameter("slackNotificationPrLevel"));
         }
 
-        String channel = req.getParameter("slackChannelName");
-        String webHookUrl = req.getParameter("slackWebHookUrl");
-        slackSettingsService.setSlackSettings(repository, new ImmutableSlackSettings(enabled, enabledPush, channel, webHookUrl));
+        slackSettingsService.setSlackSettings(
+                repository,
+                new ImmutableSlackSettings(
+                        "on".equals(req.getParameter("slackNotificationsOverrideEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsOpenedEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsReopenedEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsUpdatedEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsApprovedEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsUnapprovedEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsDeclinedEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsMergedEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsCommentedEnabled")),
+                        "on".equals(req.getParameter("slackNotificationsEnabledForPush")),
+                        "on".equals(req.getParameter("slackNotificationsEnabledForPersonal")),
+                        notificationLevel,
+                        notificationPrLevel,
+                        req.getParameter("slackChannelName"),
+                        req.getParameter("slackWebHookUrl").trim(),
+                        req.getParameter("slackUsername").trim(),
+                        req.getParameter("slackIconUrl").trim(),
+                        req.getParameter("slackIconEmoji").trim()
+                )
+        );
 
         doGet(req, res);
     }
@@ -84,12 +103,12 @@ public class SlackSettingsServlet extends HttpServlet {
             return;
         }
         String[] pathParts = pathInfo.substring(1).split("/");
-        if (pathParts.length != 2) {
+        if (pathParts.length != 4) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        String projectKey = pathParts[0];
-        String repoSlug = pathParts[1];
+        String projectKey = pathParts[1];
+        String repoSlug = pathParts[3];
         
         this.repository = repositoryService.getBySlug(projectKey, repoSlug);
         if (repository == null) {
@@ -105,10 +124,11 @@ public class SlackSettingsServlet extends HttpServlet {
         validationService.validateForRepository(repository, Permission.REPO_ADMIN);
         SlackSettings slackSettings = slackSettingsService.getSlackSettings(repository);
         render(response,
-                "stash.page.slack.settings.viewSlackSettings",
+                "bitbucketserver.page.slack.settings.viewSlackSettings",
                 ImmutableMap.<String, Object>builder()
                         .put("repository", repository)
                         .put("slackSettings", slackSettings)
+                        .put("notificationLevels", new SelectFieldOptions(NotificationLevel.values()).toSoyStructure())
                         .build()
         );
     }

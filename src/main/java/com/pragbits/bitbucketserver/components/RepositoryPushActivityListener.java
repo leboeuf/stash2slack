@@ -1,24 +1,25 @@
-package com.pragbits.stash.components;
+package com.pragbits.bitbucketserver.components;
 
 import com.atlassian.event.api.EventListener;
-import com.atlassian.stash.commit.CommitService;
-import com.atlassian.stash.content.Changeset;
-import com.atlassian.stash.content.ChangesetsBetweenRequest;
-import com.atlassian.stash.event.RepositoryPushEvent;
-import com.atlassian.stash.nav.NavBuilder;
-import com.atlassian.stash.repository.RefChange;
-import com.atlassian.stash.repository.RefChangeType;
-import com.atlassian.stash.repository.Repository;
-import com.atlassian.stash.util.Page;
-import com.atlassian.stash.util.PageRequest;
-import com.atlassian.stash.util.PageUtils;
+import com.atlassian.bitbucket.commit.CommitService;
+import com.atlassian.bitbucket.commit.Changeset;
+import com.atlassian.bitbucket.commit.CommitsBetweenRequest;
+import com.atlassian.bitbucket.commit.Commit;
+import com.atlassian.bitbucket.event.repository.RepositoryPushEvent;
+import com.atlassian.bitbucket.nav.NavBuilder;
+import com.atlassian.bitbucket.repository.RefChange;
+import com.atlassian.bitbucket.repository.RefChangeType;
+import com.atlassian.bitbucket.repository.Repository;
+import com.atlassian.bitbucket.util.Page;
+import com.atlassian.bitbucket.util.PageRequest;
+import com.atlassian.bitbucket.util.PageUtils;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.pragbits.stash.SlackGlobalSettingsService;
-import com.pragbits.stash.SlackSettings;
-import com.pragbits.stash.SlackSettingsService;
-import com.pragbits.stash.tools.*;
+import com.pragbits.bitbucketserver.SlackGlobalSettingsService;
+import com.pragbits.bitbucketserver.SlackSettings;
+import com.pragbits.bitbucketserver.SlackSettingsService;
+import com.pragbits.bitbucketserver.tools.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class RepositoryPushActivityListener {
         // find out if notification is enabled for this repo
         Repository repository = event.getRepository();
         SlackSettings slackSettings = slackSettingsService.getSlackSettings(repository);
-        String globalHookUrl = slackGlobalSettingsService.getWebHookUrl(KEY_GLOBAL_SETTING_HOOK_URL);
+        String globalHookUrl = slackGlobalSettingsService.getWebHookUrl();
 
         if (slackSettings.isSlackNotificationsEnabledForPush()) {
             String localHookUrl = slackSettings.getSlackWebHookUrl();
@@ -99,25 +100,25 @@ public class RepositoryPushActivityListener {
                 payload.setText(text);
                 payload.setMrkdwn(true);
 
-                List<Changeset> myChanges = new LinkedList<Changeset>();
-                if (refChange.getFromHash().equalsIgnoreCase("0000000000000000000000000000000000000000")) {
+                List<Commit> myChanges = new LinkedList<Commit>();
+                //if (refChange.getFromHash().equalsIgnoreCase("0000000000000000000000000000000000000000")) {
                     // issue#3 if fromHash is all zero (meaning the beginning of everything, probably), then this push is probably
                     // a new branch, and we want only to display the latest commit, not the entire history
-                    Changeset latestChangeSet = commitService.getChangeset(repository, refChange.getToHash());
-                    myChanges.add(latestChangeSet);
-                } else {
-                    ChangesetsBetweenRequest request = new ChangesetsBetweenRequest.Builder(repository)
+                //    Changeset latestChangeSet = commitService.getChangeset(repository, refChange.getToHash());
+                //    myChanges.add(latestChangeSet);
+                //} else {
+                    CommitsBetweenRequest request = new CommitsBetweenRequest.Builder(repository)
                             .exclude(refChange.getFromHash())
                             .include(refChange.getToHash())
                             .build();
 
-                    Page<Changeset> changeSets = commitService.getChangesetsBetween(
+                    Page<Commit> changeSets = commitService.getCommitsBetween(
                             request, PageUtils.newRequest(0, PageRequest.MAX_PAGE_LIMIT));
 
                     myChanges.addAll(Lists.newArrayList(changeSets.getValues()));
-                }
+                //}
 
-                for (Changeset ch : myChanges) {
+                for (Commit ch : myChanges) {
                     SlackAttachment attachment = new SlackAttachment();
                     attachment.setFallback(text);
                     attachment.setColor("#aabbcc");

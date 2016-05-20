@@ -1,18 +1,23 @@
-package com.pragbits.stash.components;
+package com.pragbits.bitbucketserver.components;
 
 import com.atlassian.event.api.EventListener;
-import com.atlassian.stash.event.pull.PullRequestActivityEvent;
-import com.atlassian.stash.nav.NavBuilder;
-import com.atlassian.stash.pull.PullRequestService;
-import com.atlassian.stash.repository.Repository;
+import com.atlassian.bitbucket.event.pull.PullRequestActivityEvent;
+import com.atlassian.bitbucket.nav.NavBuilder;
+import com.atlassian.bitbucket.pull.PullRequestService;
+import com.atlassian.bitbucket.repository.Repository;
 import com.google.gson.Gson;
-import com.pragbits.stash.SlackGlobalSettingsService;
-import com.pragbits.stash.SlackSettings;
-import com.pragbits.stash.SlackSettingsService;
-import com.pragbits.stash.models.PullRequestEvent;
-import com.pragbits.stash.tools.*;
+import com.pragbits.bitbucketserver.SlackGlobalSettingsService;
+import com.pragbits.bitbucketserver.SlackSettings;
+import com.pragbits.bitbucketserver.SlackSettingsService;
+import com.pragbits.bitbucketserver.models.PullRequestEvent;
+import com.pragbits.bitbucketserver.tools.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class PullRequestActivityListener {
     static final String KEY_GLOBAL_SETTING_HOOK_URL = "stash2slack.globalsettings.hookurl";
@@ -42,7 +47,7 @@ public class PullRequestActivityListener {
         // find out if notification is enabled for this repo
         Repository repository = event.getPullRequest().getToRef().getRepository();
         SlackSettings slackSettings = slackSettingsService.getSlackSettings(repository);
-        String globalHookUrl = slackGlobalSettingsService.getWebHookUrl(KEY_GLOBAL_SETTING_HOOK_URL);
+        String globalHookUrl = slackGlobalSettingsService.getWebHookUrl();
 
         if (slackSettings.isSlackNotificationsEnabled()) {
 
