@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.pragbits.bitbucketserver</groupId>
     <artifactId>stash2slack</artifactId>
-    <version>3.0.3</version>
+    <version>3.1.0</version>
     <organization>
         <name>Equisoft</name>
         <url>http://equisoft.com/</url>
@@ -15,10 +17,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bitbucket.version>4.1.0</bitbucket.version>
+        <bitbucket.version>4.13.0</bitbucket.version>
         <bitbucket.data.version>${bitbucket.version}</bitbucket.data.version>
-        <atlassian-sal-api.version>3.0.5</atlassian-sal-api.version>
-        <amps.version>6.1.0</amps.version>
+        <atlassian-sal-api.version>3.1.0</atlassian-sal-api.version>
+        <amps.version>6.2.11</amps.version>
     </properties>
 
     <dependencyManagement>
@@ -33,20 +35,14 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
-
-  	<dependency>
+        <dependency>
             <groupId>com.atlassian.bitbucket.server</groupId>
             <artifactId>bitbucket-api</artifactId>
             <scope>provided</scope>
         </dependency>
- 	<dependency>
+        <dependency>
             <groupId>com.atlassian.bitbucket.server</groupId>
             <artifactId>bitbucket-spi</artifactId>
-            <scope>provided</scope>
-        </dependency>
-    	<dependency>
-            <groupId>com.atlassian.bitbucket.server</groupId>
-            <artifactId>bitbucket-git-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -54,7 +50,12 @@
             <artifactId>bitbucket-util</artifactId>
             <scope>provided</scope>
         </dependency>
- 	<dependency>
+        <dependency>
+            <groupId>com.atlassian.bitbucket.server</groupId>
+            <artifactId>bitbucket-git-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.sal</groupId>
             <artifactId>sal-api</artifactId>
             <version>${atlassian-sal-api.version}</version>
@@ -121,11 +122,10 @@
             <version>1.4.0</version>
         </dependency>
         <dependency>
-         <groupId>xalan</groupId>
-         <artifactId>xalan</artifactId>
-         <version>2.7.1</version>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+            <version>2.7.1</version>
         </dependency>
-        
     </dependencies>
     <build>
         <plugins>
@@ -143,6 +143,8 @@
                             <dataVersion>${bitbucket.data.version}</dataVersion>
                         </product>
                     </products>
+                    <enableQuickReload>true</enableQuickReload>
+                    <enableFastdev>false</enableFastdev>
                 </configuration>
             </plugin>
             <plugin>
@@ -155,29 +157,24 @@
             </plugin>
         </plugins>
     </build>
-
-
-  <repositories>
+    <repositories>
         <repository>
             <id>atlassian-public</id>
-            <url>https://maven.atlassian.com/content/groups/public</url>
+            <url>https://packages.atlassian.com/maven-public</url>
             <releases>
                 <enabled>true</enabled>
                 <checksumPolicy>warn</checksumPolicy>
             </releases>
         </repository>
     </repositories>
-
-    <pluginRepositories>
+	<pluginRepositories>
         <pluginRepository>
             <id>atlassian-public</id>
-            <url>https://maven.atlassian.com/content/groups/public</url>
+            <url>https://packages.atlassian.com/maven-public</url>
             <releases>
                 <enabled>true</enabled>
                 <checksumPolicy>warn</checksumPolicy>
             </releases>
         </pluginRepository>
     </pluginRepositories>
-
-
 </project>
